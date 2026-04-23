@@ -1,0 +1,67 @@
+version: '3.8'
+
+# Configurações comuns para evitar repetição (DRY - Don't Repeat Yourself)
+x-airflow-common: &airflow-common
+  build: .          # <- troca image por build
+  environment:
+    &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__CORE__LOGGING_LEVEL: INFO
+    OPENCAGE_API_KEY: ${OPENCAGE_API_KEY}
+    AZURE_ACCOUNT_KEY: ${AZURE_ACCOUNT_KEY}
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./pipelines:/opt/airflow/pipelines
+    - ./logs:/opt/airflow/logs
+    - ./plugins:/opt/airflow/plugins
+    - ./data:/opt/airflow/data
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on:
+    postgres:
+      condition: service_healthy
+
+services:
+  # 1. O Banco de Dados
+  postgres:
+    image: postgres:13
+    container_name: airflow_postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. A Interface Web (Porta 8080)
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow_webserver
+    command: webserver
+    ports:
+      - "8080:8080"
+    restart: always
+
+  # 3. O Agendador e Executor
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow_scheduler
+    command: scheduler
+    restart: always
+
+  # 4. O Inicializador (Roda uma vez e para)
+  airflow-init:
+    <<: *airflow-common
+    container_name: airflow_init
+    command: version
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_UPGRADE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}

@@ -1,0 +1,14 @@
+[project]
+name = "footballdataengineering"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "beautifulsoup4",
+    "pandas",
+    "requests",
+    "lxml",
+    "apache-airflow-providers-microsoft-azure",
+    "apache-airflow>=3.2.0",
+    "geopy>=2.4.1",
+    "adlfs>=2026.4.0",
+]

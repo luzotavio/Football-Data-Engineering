@@ -1,0 +1,32 @@
+# --- Python & Ambiente ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+uv.lock
+
+# --- IDE (PyCharm) ---
+.idea/
+.vscode/
+*.swp
+
+# --- Docker & Segredos ---
+# NUNCA suba o .env, ele contém suas credenciais!
+.env
+.docker/
+
+# --- Airflow ---
+# Logs crescem muito rápido e não devem ir para o Git
+logs/
+airflow.db
+airflow.cfg
+webserver_config.py
+
+# --- Dados & Saídas ---
+# Geralmente não subimos os CSVs finais, apenas o código que os gera
+data/*.csv
+data/*.json
+data/*.parquet
+# Se quiser manter a pasta 'data' no Git (mesmo vazia),
+# crie um arquivo .gitkeep dentro dela e remova a linha abaixo:
+# !data/.gitkeep
