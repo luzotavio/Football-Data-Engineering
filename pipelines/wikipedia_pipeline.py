@@ -107,7 +107,6 @@ def get_lat_long(query):
 
 
 def transform_wikipedia_data(**kwargs):
-    import pandas as pd
 
     data = kwargs['ti'].xcom_pull(key='rows', task_ids='extract_data_from_wikipedia')
     data = json.loads(data)
@@ -146,6 +145,6 @@ def write_wikipedia_data(**kwargs):
 
     data.to_csv('abfs://footballdataeng@footballdataenglo.dfs.core.windows.net/data/' + file_name,
                 storage_options={
-                    'account_key': os.environ.get('AZURE_ACCOUNT_KEY')
+                'account_key': os.environ.get('AZURE_ACCOUNT_KEY')
                 }, index=False)
 
