@@ -14,6 +14,7 @@ uv.lock
 # NUNCA suba o .env, ele contém suas credenciais!
 .env
 .docker/
+script/
 
 # --- Airflow ---
 # Logs crescem muito rápido e não devem ir para o Git
@@ -23,10 +24,16 @@ airflow.cfg
 webserver_config.py
 
 # --- Dados & Saídas ---
-# Geralmente não subimos os CSVs finais, apenas o código que os gera
-data/*.csv
-data/*.json
-data/*.parquet
-# Se quiser manter a pasta 'data' no Git (mesmo vazia),
-# crie um arquivo .gitkeep dentro dela e remova a linha abaixo:
-# !data/.gitkeep
+# Mantém a pasta no Git mas ignora todos os arquivos de dados
+data/*
+!data/.gitkeep
+
+# --- Temporários e Sistema ---
+context.txt
+Thumbs.db
+.DS_Store
+
+# --- Build ---
+build/
+dist/
+*.egg-info/
